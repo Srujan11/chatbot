@@ -1,30 +1,22 @@
-import asyncio, json
-import re
-
-from EdgeGPT.EdgeGPT import Chatbot, ConversationStyle
+import openai
 
 async def query_to_bing_gpt(query):
 	print(f"{query} to AI")
-	cookies = json.loads(open("bing_cookies_*.json", encoding="utf-8").read())
+	# Set up your OpenAI API credentials
+	openai.api_key = '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'
 
-	bot = await Chatbot.create(cookies = cookies) # Passing cookies is "optional", as explained above
+	# Generate a completion using the OpenAI API
+	response = openai.Completion.create(
+	  engine="text-davinci-003",
+	  prompt=query,
+	  max_tokens=50,
+	  n=1,
+	  stop=None,
+	  temperature=0.2
+	)
 
-	response = await bot.ask(prompt=query, conversation_style=ConversationStyle.creative, simplify_response=True)
+	# Get the generated answer from the API response
+	answer = response.choices[0].text.strip()
+	print(answer)
 
-    # response = await bot.ask(prompt="who is the director of no time to die?", conversation_style=ConversationStyle.creative, simplify_response=True)
-    # response = await bot.ask(prompt="what is the imdb rating of no time to die?", conversation_style=ConversationStyle.creative, simplify_response=True)
-    # response = await bot.ask(prompt="imdb rating of no time to die?", conversation_style=ConversationStyle.creative, simplify_response=True)
-
-    # print(json.dumps(response, indent=2)) # Returns
-
-    # Define the pattern to match the substrings
-	pattern = r"\[\^\d+\^\]"
-
-    # Use re.sub() to remove the substrings
-	new_string = re.sub(pattern, "", response["text"])
-
-	print(new_string)
-
-	await bot.close()
-
-	return new_string
+	return answer
