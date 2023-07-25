@@ -5,7 +5,7 @@ import boto3
 import wikipedia
 
 def recognize_celebrities(photo):
-    celebrityInfo = []
+    celebrityInfo = ""
     session = boto3.Session(profile_name='default')
     client = session.client('rekognition')
 
@@ -29,14 +29,17 @@ def recognize_celebrities(photo):
         celebrity_data = {}
         celebrity_data["name"] = celebrity['Name']
 
+        celebrityInfo = celebrityInfo + celebrity["Name"]
+
         try:
-            wiki_data = wikipedia.summary(celebrity['Name'], sentences = 2)
+            wiki_data = wikipedia.summary(celebrity['Name'], sentences = 1)
             celebrity_data["description"] = wiki_data
+            celebrityInfo = celebrityInfo + f" - {wiki_data},\n"
         except Exception as e:
             print(f"Unable to get wiki description of {celebrity['Name']}")
             print("Exception: ", e)
 
-        celebrityInfo.append(celebrity_data)
+        # celebrityInfo.append(celebrity_data)
     return celebrityInfo
 
 # def main():

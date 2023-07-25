@@ -3,7 +3,7 @@ import openai
 async def query_to_bing_gpt(query):
 	print(f"{query} to AI")
 	# Set up your OpenAI API credentials
-	openai.api_key = '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'
+	openai.api_key = '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'
 
 	# Generate a completion using the OpenAI API
 	response = openai.Completion.create(
