@@ -1,6 +1,8 @@
 from flask import Flask,jsonify,request
 from image__processing import recognize_celebrities
+from query_processing import query_to_bing_gpt
 import os
+import asyncio
 
 app = Flask(__name__)
 
@@ -12,9 +14,9 @@ def health_check():
 @app.route('/clientrequest', methods=['POST'])
 def client_request_handler():
     try:
-        # Get the data from the client's request (assuming it's in JSON format)
-        # data = request.get_json()
+
         if "image" in request.files:
+            print("Processing Image")
             file = request.files['image']
             filename = file.filename
             file.save(os.path.join(os.getcwd(), filename))
@@ -23,12 +25,22 @@ def client_request_handler():
             # For example, you can extract information, call other functions, etc.
             result = process_client_image(filename)
             # Return the result as a JSON response
-            return jsonify(result)
+            return jsonify({"result": result})
+
+        elif "query" in request.get_json():
+            print("Processing Query")
+            # Get the data from the client's request (assuming it's in JSON format)
+            data = request.get_json()
+            print(f"data: {data}")
+            result = asyncio.run(query_to_bing_gpt(data["query"]))
+            return jsonify({"result": result})
+
         else:
-            # Return the result as a JSON response
-            return jsonify([])
+            print("No proper input")
+            return jsonify({"result": "Invalid Input"})
     
     except Exception as e:
+        print("Exception: ", e)
         return jsonify({"error": str(e)}), 500
 
 def process_client_image(filename):

@@ -28,8 +28,14 @@ def recognize_celebrities(photo):
 
         celebrity_data = {}
         celebrity_data["name"] = celebrity['Name']
-        wiki_data = wikipedia.summary(celebrity_data["name"], sentences = 2)
-        celebrity_data["description"] = wiki_data
+
+        try:
+            wiki_data = wikipedia.summary(celebrity['Name'], sentences = 2)
+            celebrity_data["description"] = wiki_data
+        except Exception as e:
+            print(f"Unable to get wiki description of {celebrity['Name']}")
+            print("Exception: ", e)
+
         celebrityInfo.append(celebrity_data)
     return celebrityInfo
 
